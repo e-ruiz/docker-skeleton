@@ -1,0 +1,67 @@
+#
+# Docker structure
+# @see https://github.com/rodrigoSyscop/dockerarticle
+#
+# PHP Skeleton - PHP the right way!
+# @see https://github.com/php-pds/skeleton
+#
+# Docker PHP Laravel (Step-4)
+# @see https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=7&ved=2ahUKEwiBy7CF-OjhAhVzGbkGHZ_4CCgQFjAGegQIBxAB&url=https%3A%2F%2Fwww.digitalocean.com%2Fcommunity%2Ftutorials%2Fhow-to-set-up-laravel-nginx-and-mysql-with-docker-compose&usg=AOvVaw1cgXAwq3gmmSPzuiZqGGQN
+#
+#
+# #################################
+version: "3" 
+services:
+  # Web service layer
+  nginx:
+    image: nginx:1.13
+    volumes:
+      - "./app:/var/www/html"
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+    ports:
+      - "80:80"
+    depends_on:
+      - php
+
+  # Application service layer
+  php:
+    build:
+      context: ./web-app
+    container_name: "php-app"
+    volumes:
+      - "./web-app/src:/var/www/html"
+    ports:
+      - "9000:9000"
+    depends_on:
+      - pgsql
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=webapp
+      - DB_USER=root
+      - DB_PASS=123.456
+  
+  # Data persistence service layer
+  # 
+  # @todo mirations
+  #
+  pgsql:
+    image: "postgres:11"
+    container_name: "postgres"
+    environment:
+      - PGDATA=/var/lib/postgresql/data
+      - TZ=America/Sao_Paulo
+      # RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+    ports:
+      - "54320:5432"
+    volumes:
+      - "./pgdata:/var/lib/postgresql/data"
+      - "./database:/root/database"
+
+# Docker networks
+# todo networks
+
+# Volumes
+volumes:
+  pgdata:
+  
